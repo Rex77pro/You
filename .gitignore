@@ -1,0 +1,23 @@
+# Build-output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Lokale indstillinger og hemmeligheder
+.env
+.env.*
+appsettings.Local.json
+
+# Test- og dækningsresultater
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
