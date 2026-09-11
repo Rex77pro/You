@@ -1,9 +1,10 @@
+using You.Application.Interfaces.Repositories;
 using You.Domain.Entities;
 using You.Infrastructure.Persistence;
 
 namespace You.Infrastructure.Repositories;
 
-public class ExerciseSetRepository
+public class ExerciseSetRepository : IExerciseSetRepository
 {
     private readonly YouDbContext _context;
 
@@ -14,7 +15,7 @@ public class ExerciseSetRepository
 
     public async Task<ExerciseSet> CreateExerciseSetAsync(ExerciseSet exerciseSet)
     {
-        await _context.AddAsync(exerciseSet);
+        await _context.ExerciseSets.AddAsync(exerciseSet);
         await _context.SaveChangesAsync();
         return exerciseSet;
     }
@@ -24,35 +25,15 @@ public class ExerciseSetRepository
         return await _context.ExerciseSets.FindAsync(id);
     }
 
-    public async Task<ExerciseSet> UpdateExerciseSetAsync(Guid id, ExerciseSet updateVariables)
+    public async Task<ExerciseSet> UpdateExerciseSetAsync(ExerciseSet exerciseSet)
     {
-        ExerciseSet? exerciseSet = await _context.ExerciseSets.FindAsync(id);
-
-        if (exerciseSet == null)
-        {
-            throw new KeyNotFoundException($"Object key: {id}, not found.");
-        }
-
-        exerciseSet.SetNumber = updateVariables.SetNumber;
-        exerciseSet.RepCount = updateVariables.RepCount;
-        exerciseSet.Weight = updateVariables.Weight;
-        exerciseSet.Duration = updateVariables.Duration;
-        exerciseSet.Note = updateVariables.Note;
-
         await _context.SaveChangesAsync();
         return exerciseSet;
     }
 
-    public async Task DeleteExerciseSetAsync(Guid id)
+    public async Task DeleteExerciseSetAsync(ExerciseSet exerciseSet)
     {
-        ExerciseSet? exerciseSet = await _context.ExerciseSets.FindAsync(id);
-
-        if (exerciseSet == null)
-        {
-            throw new KeyNotFoundException($"Object key: {id}, not found.");
-        }
-
-        _context.Remove(exerciseSet);
+        _context.ExerciseSets.Remove(exerciseSet);
         await _context.SaveChangesAsync();
     }
 }

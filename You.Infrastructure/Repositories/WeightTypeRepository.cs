@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using You.Application.Interfaces.Repositories;
 using You.Domain.Entities;
 using You.Infrastructure.Persistence;
 
 namespace You.Infrastructure.Repositories;
 
-public class WeightTypeRepository
+public class WeightTypeRepository : IWeightTypeRepository
 {
     private readonly YouDbContext _context;
 
@@ -15,7 +16,7 @@ public class WeightTypeRepository
 
     public async Task<WeightType> CreateWeightTypeAsync(WeightType weightType)
     {
-        await _context.AddAsync(weightType);
+        await _context.WeightTypes.AddAsync(weightType);
         await _context.SaveChangesAsync();
         return weightType;
     }
@@ -25,16 +26,9 @@ public class WeightTypeRepository
         return await _context.WeightTypes.ToListAsync();
     }
 
-    public async Task DeleteWeightTypeAsync(Guid id)
+    public async Task DeleteWeightTypeAsync(WeightType weightType)
     {
-        WeightType? weightType = await _context.WeightTypes.FindAsync(id);
-
-        if (weightType == null)
-        {
-            throw new KeyNotFoundException($"Object id: {id}, not found.");
-        }
-
-        _context.Remove(weightType);
+        _context.WeightTypes.Remove(weightType);
         await _context.SaveChangesAsync();
     }
 }

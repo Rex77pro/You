@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using You.Application.Interfaces.Repositories;
 using You.Domain.Entities;
 using You.Infrastructure.Persistence;
 
 namespace You.Infrastructure.Repositories;
 
-public class DayExerciseRepository
+public class DayExerciseRepository : IDayExerciseRepository
 {
     private readonly YouDbContext _context;
 
@@ -15,7 +16,7 @@ public class DayExerciseRepository
 
     public async Task<DayExercise> CreateDayExerciseAsync(DayExercise dayExercise)
     {
-        await _context.AddAsync(dayExercise);
+        await _context.DayExercises.AddAsync(dayExercise);
         await _context.SaveChangesAsync();
         return dayExercise;
     }
@@ -35,32 +36,15 @@ public class DayExerciseRepository
         )
         .ToListAsync();
     }
-    public async Task<DayExercise> UpdateDayExerciseAsync(Guid id, DayExercise updateVariables)
+    public async Task<DayExercise> UpdateDayExerciseAsync(DayExercise dayExercise)
     {
-        DayExercise? dayExercise = await _context.DayExercises.FindAsync(id);
-
-        if (dayExercise == null)
-        {
-            throw new KeyNotFoundException($"Object key: {id}, not found");
-        }
-
-        dayExercise.Date = updateVariables.Date;
-        dayExercise.ExerciseOrder = updateVariables.ExerciseOrder;
-
         await _context.SaveChangesAsync();
         return dayExercise;
     }
 
-    public async Task DeleteDayExerciseAsync(Guid id)
+    public async Task DeleteDayExerciseAsync(DayExercise dayExercise)
     {
-        DayExercise? dayExercise = await _context.DayExercises.FindAsync(id);
-
-        if (dayExercise == null)
-        {
-            throw new KeyNotFoundException($"Object key: {id}, not found");
-        }
-
-        _context.Remove(dayExercise);
+        _context.DayExercises.Remove(dayExercise);
         await _context.SaveChangesAsync();
     }
 

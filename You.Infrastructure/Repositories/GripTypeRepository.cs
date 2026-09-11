@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using You.Application.Interfaces.Repositories;
 using You.Domain.Entities;
 using You.Infrastructure.Persistence;
 
 namespace You.Infrastructure.Repositories;
 
-public class GripTypeRepository
+public class GripTypeRepository : IGripTypeRepository
 {
     private readonly YouDbContext _context;
 
@@ -15,7 +16,7 @@ public class GripTypeRepository
 
     public async Task<GripType> CreateGripTypeAsync(GripType gripType)
     {
-        await _context.AddAsync(gripType);
+        await _context.GripTypes.AddAsync(gripType);
         await _context.SaveChangesAsync();
         return gripType;
     }
@@ -25,16 +26,9 @@ public class GripTypeRepository
         return await _context.GripTypes.ToListAsync();
     }
 
-    public async Task DeleteGripTypeAsync(Guid id)
+    public async Task DeleteGripTypeAsync(GripType gripType)
     {
-        GripType? gripType = await _context.GripTypes.FindAsync(id);
-
-        if (gripType == null)
-        {
-            throw new KeyNotFoundException($"Object id: {id}, not found.");
-        }
-
-        _context.Remove(gripType);
+        _context.GripTypes.Remove(gripType);
         await _context.SaveChangesAsync();
     }
 }

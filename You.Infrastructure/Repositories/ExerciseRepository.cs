@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using You.Application.Interfaces.Repositories;
 using You.Domain.Entities;
 using You.Infrastructure.Persistence;
 
 namespace You.Infrastructure.Repositories;
 
-public class ExerciseRepository
+public class ExerciseRepository : IExerciseRepository
 {
     private readonly YouDbContext _context;
 
@@ -15,7 +16,7 @@ public class ExerciseRepository
 
     public async Task<Exercise> CreateExerciseAsync(Exercise exercise)
     {
-        await _context.AddAsync(exercise);
+        await _context.Exercises.AddAsync(exercise);
         await _context.SaveChangesAsync();
         return exercise;
     }
@@ -30,32 +31,17 @@ public class ExerciseRepository
         return await _context.Exercises.ToListAsync();
     }
 
-    public async Task<Exercise> UpdateExerciseAsync(Guid id, Exercise updateVariables)
+    public async Task<Exercise> UpdateExerciseAsync(Exercise exercise)
     {
-        Exercise? exercise = await _context.Exercises.FindAsync(id);
-
-        if (exercise == null)
-        {
-            throw new KeyNotFoundException($"Object key: {id}, not found.");
-        }
-
-        exercise.Name = updateVariables.Name;
-        exercise.ImageKey = updateVariables.ImageKey;
-
         await _context.SaveChangesAsync();
         return exercise;
     }
 
-    public async Task DeleteExerciseAsync(Guid id)
+    public async Task DeleteExerciseAsync(Exercise exercise)
     {
-        Exercise? exercise = await _context.Exercises.FindAsync(id);
-
-        if (exercise == null)
-        {
-            throw new KeyNotFoundException($"Object key: {id}, not found");
-        }
-
-        _context.Remove(exercise);
+        _context.Exercises.Remove(exercise);
         await _context.SaveChangesAsync();
     }
+
+    
 }
