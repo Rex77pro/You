@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using You.Application.Interfaces.Repositories;
 using You.Domain.Entities;
 using You.Infrastructure.Persistence;
@@ -23,6 +24,14 @@ public class ExerciseSetRepository : IExerciseSetRepository
     public async Task<ExerciseSet?> GetExerciseSetAsync(Guid id)
     {
         return await _context.ExerciseSets.FindAsync(id);
+    }
+
+    public async Task<List<ExerciseSet>> GetExerciseSetsByDayExerciseIdAsync(Guid dayExerciseId)
+    {
+        return await _context.ExerciseSets
+                .Where(x => x.DayExerciseId == dayExerciseId)
+                .OrderBy(x => x.SetNumber)
+                .ToListAsync();
     }
 
     public async Task<ExerciseSet> UpdateExerciseSetAsync(ExerciseSet exerciseSet)

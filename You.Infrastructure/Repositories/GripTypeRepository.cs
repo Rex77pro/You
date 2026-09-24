@@ -21,6 +21,11 @@ public class GripTypeRepository : IGripTypeRepository
         return gripType;
     }
 
+    public async Task<GripType?> GetGripTypeAsync(Guid id)
+    {
+        return await _context.GripTypes.FindAsync(id);
+    }
+
     public async Task<List<GripType>> GetAllAsync()
     {
         return await _context.GripTypes.ToListAsync();

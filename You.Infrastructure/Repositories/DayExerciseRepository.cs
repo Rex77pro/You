@@ -21,6 +21,11 @@ public class DayExerciseRepository : IDayExerciseRepository
         return dayExercise;
     }
 
+    public async Task<DayExercise?> GetDayExerciseByIdAsync(Guid id)
+    {
+        return await _context.DayExercises.FindAsync(id);
+    }
+
     public async Task<List<DayExercise>> GetDayExerciseByDateAsync(DateOnly date)
     {
         return await _context.DayExercises.Where(

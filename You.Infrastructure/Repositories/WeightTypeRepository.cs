@@ -21,6 +21,11 @@ public class WeightTypeRepository : IWeightTypeRepository
         return weightType;
     }
 
+    public async Task<WeightType?> GetWeightTypeAsync(Guid id)
+    {
+        return await _context.WeightTypes.FindAsync(id);
+    }
+
     public async Task<List<WeightType>> GetAllAsync()
     {
         return await _context.WeightTypes.ToListAsync();
