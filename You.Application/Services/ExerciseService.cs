@@ -1,5 +1,6 @@
 using You.Application.Interfaces.Repositories;
 using You.Application.Interfaces.Services;
+using You.Application.Validators;
 using You.Domain.Entities;
 
 namespace You.Application.Services;
@@ -19,6 +20,8 @@ public class ExerciseService : IExerciseService
         {
             throw new ArgumentException("Exercise name must not be null or whitespace.", nameof(exercise.Name));
         }
+
+        ImageKeyValidator.Validate(exercise.ImageKey);
 
         return await _repo.CreateExerciseAsync(exercise);
     }
@@ -54,11 +57,17 @@ public class ExerciseService : IExerciseService
             throw new KeyNotFoundException($"Object key: {id}, not found.");
         }
 
+        if (string.IsNullOrWhiteSpace(updateVariables.Name))
+        {
+            throw new ArgumentException("Exercise name must not be null or whitespace.", nameof(updateVariables.Name));
+        }
+
+        ImageKeyValidator.Validate(updateVariables.ImageKey);
+
         exercise.Name = updateVariables.Name;
         exercise.ImageKey = updateVariables.ImageKey;
 
-        await _repo.UpdateExerciseAsync(exercise);
-        return exercise;
+        return await _repo.UpdateExerciseAsync(exercise);
     }
 
     public async Task DeleteExerciseAsync(Guid id)
