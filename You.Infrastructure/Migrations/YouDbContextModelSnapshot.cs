@@ -110,11 +110,15 @@ namespace You.Infrastructure.Migrations
 
                     b.HasKey("ExerciseVariantId");
 
-                    b.HasIndex("ExerciseId");
-
                     b.HasIndex("GripTypeId");
 
                     b.HasIndex("WeightTypeId");
+
+                    b.HasIndex("ExerciseId", "GripTypeId", "WeightTypeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ExerciseVariants_ExerciseId_GripTypeId_WeightTypeId");
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("ExerciseId", "GripTypeId", "WeightTypeId"), false);
 
                     b.ToTable("ExerciseVariants");
                 });
@@ -160,7 +164,7 @@ namespace You.Infrastructure.Migrations
                     b.HasOne("You.Domain.Entities.ExerciseVariant", "ExerciseVariant")
                         .WithMany("DayExercises")
                         .HasForeignKey("ExerciseVariantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.Navigation("ExerciseVariant");
@@ -182,16 +186,18 @@ namespace You.Infrastructure.Migrations
                     b.HasOne("You.Domain.Entities.Exercise", "Exercise")
                         .WithMany()
                         .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.HasOne("You.Domain.Entities.GripType", "GripType")
                         .WithMany()
-                        .HasForeignKey("GripTypeId");
+                        .HasForeignKey("GripTypeId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("You.Domain.Entities.WeightType", "WeightType")
                         .WithMany()
-                        .HasForeignKey("WeightTypeId");
+                        .HasForeignKey("WeightTypeId")
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.Navigation("Exercise");
 

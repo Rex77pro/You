@@ -40,15 +40,34 @@ public class ExerciseSetService : IExerciseSetService
             throw new ArgumentException("Weight cannot contain more that 2 decimal", nameof(exerciseSet.Weight));
         }
 
-        if (exerciseSet.Note != null )
+        if (exerciseSet.Note != null)
         {
             if (exerciseSet.Note.Length > 500)
             {
-                throw new ArgumentException("Note cannot exceed 500 characters.", nameof(exerciseSet.Note));   
+                throw new ArgumentException("Note cannot exceed 500 characters.", nameof(exerciseSet.Note));
             }
         }
+        
+        var dayExercise = new DayExercise()
+        {
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            ExerciseOrder = 1,
+            ExerciseVariantId = new Guid()
+        };
 
-        return await _repo.CreateExerciseSetAsync(exerciseSet);
+        var newExerciseSet = new ExerciseSet
+        {
+            SetNumber = 1,
+            RepCount = exerciseSet.RepCount,
+            Weight = exerciseSet.Weight,
+            Duration = exerciseSet.Duration,
+            Note = exerciseSet.Note,
+            DayExercise = dayExercise
+        };
+
+        dayExercise.Sets.Add(newExerciseSet);
+
+        return await _repo.CreateExerciseSetAsync(newExerciseSet);
     }
 
     public async Task<ExerciseSet?> GetExerciseSetAsync(Guid id)

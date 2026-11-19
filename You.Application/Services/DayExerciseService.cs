@@ -6,21 +6,17 @@ namespace You.Application.Services;
 
 public class DayExerciseService : IDayExerciseService
 {
-    private readonly IDayExerciseRepository _repo;
+    private readonly IDayExerciseRepository _dayRepo;
+    private readonly IExerciseVariantService _varService;
 
-    public DayExerciseService(IDayExerciseRepository repo)
+    public DayExerciseService(IDayExerciseRepository dayRepo, IExerciseVariantService varService)
     {
-        _repo = repo;
+        _dayRepo = dayRepo;
+        _varService = varService;
     }
 
     public async Task<DayExercise> CreateDayExerciseAsync(DayExercise dayExercise)
     {
-        if (dayExercise.ExerciseVariantId == Guid.Empty)
-        {
-            throw new ArgumentException("Exercise variant id must not be empty.",
-                nameof(dayExercise.ExerciseVariantId));
-        }
-
         if (dayExercise.Date == default)
         {
             throw new ArgumentException("Date must be specified.", nameof(dayExercise.Date));
@@ -31,7 +27,22 @@ public class DayExerciseService : IDayExerciseService
             throw new ArgumentException("Exercise order must be at least 1", nameof(dayExercise.ExerciseOrder));
         }
 
-        return await _repo.CreateDayExerciseAsync(dayExercise);
+        if (dayExercise.ExerciseVariant == null)
+        {
+            throw new ArgumentException(
+                "Exercise variant must be specified.",
+                nameof(dayExercise.ExerciseVariant));
+        }
+
+        var variant = await _varService.GetOrCreateExerciseVariantAsync(
+            dayExercise.ExerciseVariant.ExerciseId,
+            dayExercise.ExerciseVariant.GripTypeId,
+            dayExercise.ExerciseVariant.WeightTypeId);
+
+        dayExercise.ExerciseVariantId = variant.ExerciseVariantId;
+        dayExercise.ExerciseVariant = variant;
+
+        return await _dayRepo.CreateDayExerciseAsync(dayExercise);
     }
 
     public async Task<DayExercise> GetDayExerciseByIdAsync(Guid id)
@@ -41,7 +52,7 @@ public class DayExerciseService : IDayExerciseService
             throw new ArgumentException("Exercise id must not be empty.", nameof(id));
         }
 
-        var dayExercise = await _repo.GetDayExerciseByIdAsync(id);
+        var dayExercise = await _dayRepo.GetDayExerciseByIdAsync(id);
 
         if (dayExercise == null)
         {
@@ -57,7 +68,7 @@ public class DayExerciseService : IDayExerciseService
         {
             throw new ArgumentException("Date must be specified.", nameof(date));
         }
-        return await _repo.GetDayExerciseByDateAsync(date);
+        return await _dayRepo.GetDayExerciseByDateAsync(date);
     }
 
     public async Task<List<DayExercise>> GetDayExerciseByDateRangeAsync(DateOnly dateFrom, DateOnly dateTo)
@@ -67,7 +78,7 @@ public class DayExerciseService : IDayExerciseService
             throw new ArgumentException("Date from cannot be later that date to", nameof(dateFrom));
         }
 
-        return await _repo.GetDayExerciseByDateRangeAsync(dateFrom, dateTo);
+        return await _dayRepo.GetDayExerciseByDateRangeAsync(dateFrom, dateTo);
     }
 
     public async Task<DayExercise> UpdateDayExerciseAsync(Guid id, DayExercise updateVariables)
@@ -81,18 +92,33 @@ public class DayExerciseService : IDayExerciseService
         {
             throw new ArgumentException("Exercise order must be at least 1", nameof(updateVariables.ExerciseOrder));
         }
+
+        if (updateVariables.ExerciseVariant == null)
+        {
+            throw new ArgumentException(
+                "Exercise variant must be specified.",
+                nameof(updateVariables.ExerciseVariant));
+        }
         
-        var dayExercise = await _repo.GetDayExerciseByIdAsync(id);
+        var dayExercise = await _dayRepo.GetDayExerciseByIdAsync(id);
 
         if (dayExercise == null)
         {
             throw new KeyNotFoundException($"Object key: {id}, not found.");
         }
 
+        var variant = await _varService.GetOrCreateExerciseVariantAsync(
+            updateVariables.ExerciseVariant.ExerciseId,
+            updateVariables.ExerciseVariant.GripTypeId,
+            updateVariables.ExerciseVariant.WeightTypeId);
+        
         dayExercise.Date = updateVariables.Date;
         dayExercise.ExerciseOrder = updateVariables.ExerciseOrder;
 
-        return await _repo.UpdateDayExerciseAsync(dayExercise);
+        dayExercise.ExerciseVariantId = variant.ExerciseVariantId;
+        dayExercise.ExerciseVariant = variant;
+
+        return await _dayRepo.UpdateDayExerciseAsync(dayExercise);
     }
 
     public async Task DeleteDayExerciseAsync(Guid id)
@@ -102,13 +128,13 @@ public class DayExerciseService : IDayExerciseService
             throw new ArgumentException("Day exercise id must not be empty.", nameof(id));
         }
 
-        var dayExercise = await _repo.GetDayExerciseByIdAsync(id);
+        var dayExercise = await _dayRepo.GetDayExerciseByIdAsync(id);
 
         if (dayExercise == null)
         {
             throw new KeyNotFoundException($"Object key: {id}, not found.");
         }
 
-        await _repo.DeleteDayExerciseAsync(dayExercise);
+        await _dayRepo.DeleteDayExerciseAsync(dayExercise);
     }
 }

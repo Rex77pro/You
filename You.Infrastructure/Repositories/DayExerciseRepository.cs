@@ -23,23 +23,40 @@ public class DayExerciseRepository : IDayExerciseRepository
 
     public async Task<DayExercise?> GetDayExerciseByIdAsync(Guid id)
     {
-        return await _context.DayExercises.FindAsync(id);
+        return await _context.DayExercises
+            .Include(x => x.ExerciseVariant)
+            .ThenInclude(x => x.Exercise)
+            .Include(x => x.ExerciseVariant)
+            .ThenInclude(x => x.GripType)
+            .Include(x => x.ExerciseVariant)
+            .ThenInclude(x => x.WeightType)
+            .FirstOrDefaultAsync(x => x.DayExerciseId == id);
     }
 
     public async Task<List<DayExercise>> GetDayExerciseByDateAsync(DateOnly date)
     {
-        return await _context.DayExercises.Where(
-            x => x.Date == date
-        )
-        .ToListAsync();
+        return await _context.DayExercises
+            .Include(x => x.ExerciseVariant)
+                .ThenInclude(x => x.Exercise)
+            .Include(x => x.ExerciseVariant)
+                .ThenInclude(x => x.GripType)
+            .Include(x => x.ExerciseVariant)
+                .ThenInclude(x => x.WeightType)
+            .Where(x => x.Date == date)
+            .ToListAsync();
     }
 
     public async Task<List<DayExercise>> GetDayExerciseByDateRangeAsync(DateOnly dateFrom, DateOnly dateTo)
     {
-        return await _context.DayExercises.Where(
-            x => x.Date >= dateFrom && x.Date <= dateTo
-        )
-        .ToListAsync();
+        return await _context.DayExercises
+            .Include(x => x.ExerciseVariant)
+                .ThenInclude(x => x.Exercise)
+            .Include(x => x.ExerciseVariant)
+                .ThenInclude(x => x.GripType)
+            .Include(x => x.ExerciseVariant)
+                .ThenInclude(x => x.WeightType)            
+            .Where(x => x.Date >= dateFrom && x.Date <= dateTo)
+            .ToListAsync();
     }
     public async Task<DayExercise> UpdateDayExerciseAsync(DayExercise dayExercise)
     {
