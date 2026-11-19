@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace You.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -66,8 +66,7 @@ namespace You.Infrastructure.Migrations
                         name: "FK_ExerciseVariants_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
-                        principalColumn: "ExerciseId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ExerciseId");
                     table.ForeignKey(
                         name: "FK_ExerciseVariants_GripTypes_GripTypeId",
                         column: x => x.GripTypeId,
@@ -96,8 +95,7 @@ namespace You.Infrastructure.Migrations
                         name: "FK_DayExercises_ExerciseVariants_ExerciseVariantId",
                         column: x => x.ExerciseVariantId,
                         principalTable: "ExerciseVariants",
-                        principalColumn: "ExerciseVariantId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ExerciseVariantId");
                 });
 
             migrationBuilder.CreateTable(
@@ -134,9 +132,11 @@ namespace You.Infrastructure.Migrations
                 column: "DayExerciseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExerciseVariants_ExerciseId",
+                name: "IX_ExerciseVariants_ExerciseId_GripTypeId_WeightTypeId",
                 table: "ExerciseVariants",
-                column: "ExerciseId");
+                columns: new[] { "ExerciseId", "GripTypeId", "WeightTypeId" },
+                unique: true)
+                .Annotation("Npgsql:NullsDistinct", false);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExerciseVariants_GripTypeId",

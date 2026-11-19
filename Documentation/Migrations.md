@@ -24,6 +24,7 @@ These are the most common and most used commands for drop, migrate and update th
 
 ### Update (apply migrations)
 `dotnet ef database update [startup project](.\You.Api\)`
+`dotnet ef database update --project .\You.Infrastructure --startup-project .\You.Api`
 
 ### Drop database
 `dotnet ef database drop --project [project name](.\You.Infrastructure\) --startup-project [startup project](.\You.Api\)`
